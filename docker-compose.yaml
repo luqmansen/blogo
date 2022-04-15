@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:14.1-alpine
+    volumes:
+      - blogo-pg-volume:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: blogo
+      POSTGRES_USER: blogo
+      POSTGRES_PASSWORD: blogo
+
+volumes:
+  blogo-pg-volume:
