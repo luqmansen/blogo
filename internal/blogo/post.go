@@ -4,39 +4,35 @@ import (
 	"time"
 )
 
-type PostRequest struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
-
 type Post struct {
-	ID uint64 `json:"id"`
+	ID uint64 `db:"id" json:"id"`
 
-	AuthorID uint64
-	Title    string
-	Content  string
+	AuthorID uint64 `db:"author_id" json:"author_id"`
+	Title    string `db:"title" json:"title"`
+	Content  string `db:"content" json:"content"`
 
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 type PostRepository interface {
 	FindByID(postID uint64) error
 	InsertPost(post *Post) error
+	GetPost(limit, offset int) []*Post
 }
 
 type PostService struct {
 	db PostRepository
 }
 
-func NewPostService(db PostRepository) PostService {
-	return PostService{db: db}
+func NewPostService(db PostRepository) *PostService {
+	return &PostService{db: db}
 }
 
-func (p PostService) CreatePost(payload *PostRequest) error {
+func (p PostService) CreatePost(payload *Post) error {
 
 	post := &Post{
-		AuthorID: 0,
+		AuthorID: 1,
 		Title:    payload.Title,
 		Content:  payload.Content,
 	}
@@ -45,8 +41,7 @@ func (p PostService) CreatePost(payload *PostRequest) error {
 }
 
 func (p PostService) GetPostMany(limit, pageNum int) []*Post {
-	panic("implement me")
-	return nil
+	return p.db.GetPost(limit, pageNum)
 }
 
 func (p PostService) GetPostById(postId uint64) *Post {

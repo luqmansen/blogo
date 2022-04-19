@@ -18,13 +18,13 @@ build:
 		-o build/app/app cmd/app/main.go
 
 create-migration:
-	docker run --rm -v `pwd`/db/migration:/migrations migrate/migrate create -ext sql -dir /migrations -seq $(name)
+	docker run --rm -v `pwd`/db/migration:/migration migrate/migrate create -ext sql -dir /migration -seq $(name)
 
 migrate-up:
-	docker run --rm -v `pwd`/db/migration:/migrations --network host migrate/migrate  -path=/migrations/ -database "mysql://root:root@(0.0.0.0:3306)/blogo" up
+	docker run --rm -v `pwd`/db/migration:/migration --network host migrate/migrate  -path=/migration -database "postgres://blogo:blogo@0.0.0.0:5432/blogo?sslmode=disable" up
 
 migrate-down:
-	docker run --rm -v `pwd`/db/migration:/migrations --network host migrate/migrate  -path=/migrations/ -database "mysql://root:root@(0.0.0.0:3306)/blogo" down -all
+	docker run --rm -v `pwd`/db/migration:/migration --network host migrate/migrate  -path=/migration -database "postgres://blogo:blogo@0.0.0.0:5432/blogo?sslmode=disable" down -all
 
 
 gen-mock:

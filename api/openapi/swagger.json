@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "/api"
+      "url": "localhost:8080"
     }
   ],
   "tags": [
@@ -28,7 +28,7 @@
     }
   ],
   "paths": {
-    "/v1/post": {
+    "/api/v1/post": {
       "get": {
         "tags": [
           "post"
@@ -52,8 +52,8 @@
         "tags": [
           "post"
         ],
-        "summary": "Add a new post to",
-        "operationId": "addPost",
+        "summary": "Create a new post",
+        "operationId": "createPost",
         "requestBody": {
           "description": "Create a new post",
           "content": {
@@ -87,7 +87,7 @@
         ]
       }
     },
-    "/v1/post/{postId}": {
+    "/api/v1/post/{postId}": {
       "get": {
         "tags": [
           "post"
@@ -124,12 +124,13 @@
         ]
       }
     },
-    "/v1/comment": {
+    "/api/v1/comment": {
       "post": {
         "description": "create a single comment for a specified parent",
         "tags": [
           "comment"
         ],
+        "operationId": "addComment",
         "requestBody": {
           "content": {
             "application/json": {
@@ -153,12 +154,13 @@
         }
       }
     },
-    "/v1/comment/{commentId}": {
+    "/api/v1/comment/{commentId}": {
       "get": {
         "description": "get comment by id includes nested comment up to x level",
         "tags": [
           "comment"
         ],
+        "operationId": "getCommentByID",
         "parameters": [
           {
             "$ref": "#/components/parameters/commentId"
@@ -475,7 +477,7 @@
         ],
         "type": "object",
         "properties": {
-          "name": {
+          "title": {
             "type": "string"
           },
           "content": {
@@ -509,23 +511,16 @@
       },
       "CommentRequest": {
         "required": [
-          "parent_type",
-          "parent_id",
+          "parent_post_id",
           "content"
         ],
         "type": "object",
         "properties": {
-          "parent_type": {
-            "type": "string",
-            "description": "type of the parent in which this comment belongs to",
-            "example": "comment",
-            "enum": [
-              "post",
-              "comment"
-            ]
+          "parent_post_id": {
+            "type": "integer"
           },
           "parent_id": {
-            "type": "string"
+            "type": "integer"
           },
           "content": {
             "type": "string"
@@ -535,22 +530,20 @@
       "CommentResponse": {
         "type": "object",
         "properties": {
-          "parent_type": {
-            "type": "string",
-            "description": "type of the parent in which this comment belongs to",
-            "example": "comment"
-          },
-          "parent_id": {
-            "type": "string"
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 10
           },
           "content": {
             "type": "string"
           },
           "author_id": {
-            "type": "string"
+            "type": "integer",
+            "format": "int64"
           },
-          "comment_list": {
-            "description": "comment of this comment",
+          "replies": {
+            "description": "replies of this comment",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CommentResponse"
@@ -575,7 +568,7 @@
         "description": "ID of a comment",
         "required": true,
         "schema": {
-          "type": "string"
+          "type": "integer"
         }
       }
     },

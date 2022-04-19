@@ -13,6 +13,21 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (POST /api/v1/comment)
+	AddComment(c *gin.Context)
+
+	// (GET /api/v1/comment/{commentId})
+	GetCommentByID(c *gin.Context, commentId CommentId)
+	// get multiple post
+	// (GET /api/v1/post)
+	GetPost(c *gin.Context)
+	// Create a new post
+	// (POST /api/v1/post)
+	CreatePost(c *gin.Context)
+	// Finds Post by ID
+	// (GET /api/v1/post/{postId})
+	FindPostByID(c *gin.Context, postId PostId)
 	// Create user
 	// (POST /user)
 	CreateUser(c *gin.Context)
@@ -31,21 +46,6 @@ type ServerInterface interface {
 	// Update user
 	// (PUT /user/{username})
 	UpdateUser(c *gin.Context, username string)
-
-	// (POST /v1/comment)
-	PostV1Comment(c *gin.Context)
-
-	// (GET /v1/comment/{commentId})
-	GetV1CommentCommentId(c *gin.Context, commentId CommentId)
-	// get multiple post
-	// (GET /v1/post)
-	GetPost(c *gin.Context)
-	// Add a new post to
-	// (POST /v1/post)
-	AddPost(c *gin.Context)
-	// Finds Post by ID
-	// (GET /v1/post/{postId})
-	FindPostByID(c *gin.Context, postId PostId)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -55,6 +55,82 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
+
+// AddComment operation middleware
+func (siw *ServerInterfaceWrapper) AddComment(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.AddComment(c)
+}
+
+// GetCommentByID operation middleware
+func (siw *ServerInterfaceWrapper) GetCommentByID(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "commentId" -------------
+	var commentId CommentId
+
+	err = runtime.BindStyledParameter("simple", false, "commentId", c.Param("commentId"), &commentId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Sprintf("Invalid format for parameter commentId: %s", err)})
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.GetCommentByID(c, commentId)
+}
+
+// GetPost operation middleware
+func (siw *ServerInterfaceWrapper) GetPost(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.GetPost(c)
+}
+
+// CreatePost operation middleware
+func (siw *ServerInterfaceWrapper) CreatePost(c *gin.Context) {
+
+	c.Set(Petstore_authScopes, []string{"write:pets", "read:pets"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.CreatePost(c)
+}
+
+// FindPostByID operation middleware
+func (siw *ServerInterfaceWrapper) FindPostByID(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "postId" -------------
+	var postId PostId
+
+	err = runtime.BindStyledParameter("simple", false, "postId", c.Param("postId"), &postId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Sprintf("Invalid format for parameter postId: %s", err)})
+		return
+	}
+
+	c.Set(Petstore_authScopes, []string{"write:pets", "read:pets"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.FindPostByID(c, postId)
+}
 
 // CreateUser operation middleware
 func (siw *ServerInterfaceWrapper) CreateUser(c *gin.Context) {
@@ -176,82 +252,6 @@ func (siw *ServerInterfaceWrapper) UpdateUser(c *gin.Context) {
 	siw.Handler.UpdateUser(c, username)
 }
 
-// PostV1Comment operation middleware
-func (siw *ServerInterfaceWrapper) PostV1Comment(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-	}
-
-	siw.Handler.PostV1Comment(c)
-}
-
-// GetV1CommentCommentId operation middleware
-func (siw *ServerInterfaceWrapper) GetV1CommentCommentId(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "commentId" -------------
-	var commentId CommentId
-
-	err = runtime.BindStyledParameter("simple", false, "commentId", c.Param("commentId"), &commentId)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Sprintf("Invalid format for parameter commentId: %s", err)})
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-	}
-
-	siw.Handler.GetV1CommentCommentId(c, commentId)
-}
-
-// GetPost operation middleware
-func (siw *ServerInterfaceWrapper) GetPost(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-	}
-
-	siw.Handler.GetPost(c)
-}
-
-// AddPost operation middleware
-func (siw *ServerInterfaceWrapper) AddPost(c *gin.Context) {
-
-	c.Set(Petstore_authScopes, []string{"write:pets", "read:pets"})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-	}
-
-	siw.Handler.AddPost(c)
-}
-
-// FindPostByID operation middleware
-func (siw *ServerInterfaceWrapper) FindPostByID(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "postId" -------------
-	var postId PostId
-
-	err = runtime.BindStyledParameter("simple", false, "postId", c.Param("postId"), &postId)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": fmt.Sprintf("Invalid format for parameter postId: %s", err)})
-		return
-	}
-
-	c.Set(Petstore_authScopes, []string{"write:pets", "read:pets"})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-	}
-
-	siw.Handler.FindPostByID(c, postId)
-}
-
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL     string
@@ -270,6 +270,16 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 		HandlerMiddlewares: options.Middlewares,
 	}
 
+	router.POST(options.BaseURL+"/api/v1/comment", wrapper.AddComment)
+
+	router.GET(options.BaseURL+"/api/v1/comment/:commentId", wrapper.GetCommentByID)
+
+	router.GET(options.BaseURL+"/api/v1/post", wrapper.GetPost)
+
+	router.POST(options.BaseURL+"/api/v1/post", wrapper.CreatePost)
+
+	router.GET(options.BaseURL+"/api/v1/post/:postId", wrapper.FindPostByID)
+
 	router.POST(options.BaseURL+"/user", wrapper.CreateUser)
 
 	router.GET(options.BaseURL+"/user/login", wrapper.LoginUser)
@@ -281,16 +291,6 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 	router.GET(options.BaseURL+"/user/:username", wrapper.GetUserByName)
 
 	router.PUT(options.BaseURL+"/user/:username", wrapper.UpdateUser)
-
-	router.POST(options.BaseURL+"/v1/comment", wrapper.PostV1Comment)
-
-	router.GET(options.BaseURL+"/v1/comment/:commentId", wrapper.GetV1CommentCommentId)
-
-	router.GET(options.BaseURL+"/v1/post", wrapper.GetPost)
-
-	router.POST(options.BaseURL+"/v1/post", wrapper.AddPost)
-
-	router.GET(options.BaseURL+"/v1/post/:postId", wrapper.FindPostByID)
 
 	return router
 }

@@ -1,29 +1,22 @@
 package blogo
 
-import (
-	"time"
-)
-
-type CommentRequest struct {
-	Content string `json:"content"`
-}
+import "time"
 
 type Comment struct {
-	ID uint64 `json:"id"`
+	ID        uint64    `db:"id" json:"id"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 
-	ParentPostID uint64 `json:"parent_post_id"`
-	ParentID     uint64 `json:"parent_id"`
-	AuthorID     string `json:"author_id"`
-	Content      string `json:"content"`
-
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ParentPostID uint64     `db:"parent_post_id" json:"parent_post_id"`
+	ParentID     *int       `db:"parent_id" json:"parent_id"` // allow nullable on lvl 0 comment
+	AuthorID     uint64     `db:"author_id" json:"author_id"`
+	Content      string     `db:"content" json:"content"`
+	Replies      []*Comment `json:"replies"`
 }
 
 type CommentRepository interface {
-	FindByID(commentId uint64) *Comment
-	InsertForPost(postId uint64, commentBody *Comment) error
-	InsertForComment(commentId uint64, commentBody *Comment) error
+	GetByID(commentId uint64) *Comment
+	InsertComment(comment *Comment) error
 }
 
 type CommentService struct {
@@ -35,17 +28,13 @@ func NewCommentService(repo CommentRepository) *CommentService {
 }
 
 func (c CommentService) GetCommentByID(commentId uint64) *Comment {
-	panic("implement me")
-	return nil
+	return c.commentRepo.GetByID(commentId)
 }
 
-func (c CommentService) CreateCommentForPost(postId uint64, commentBody *CommentRequest) error {
-	panic("implement me")
-	return nil
-
+func (c CommentService) CreateComment(comment *Comment) error {
+	return c.commentRepo.InsertComment(comment)
 }
 
-func (c CommentService) CreateCommentForComment(commentId uint64, commentBody *CommentRequest) error {
-	panic("implement me")
+func BuildTree([]*Comment) []*Comment {
 	return nil
 }

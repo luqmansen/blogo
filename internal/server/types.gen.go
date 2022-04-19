@@ -7,42 +7,27 @@ const (
 	Petstore_authScopes = "petstore_auth.Scopes"
 )
 
-// Defines values for CommentRequestParentType.
-const (
-	CommentRequestParentTypeComment CommentRequestParentType = "comment"
-
-	CommentRequestParentTypePost CommentRequestParentType = "post"
-)
-
 // CommentRequest defines model for CommentRequest.
 type CommentRequest struct {
-	Content  string `json:"content"`
-	ParentId string `json:"parent_id"`
-
-	// type of the parent in which this comment belongs to
-	ParentType CommentRequestParentType `json:"parent_type"`
+	Content      string `json:"content"`
+	ParentId     *int   `json:"parent_id,omitempty"`
+	ParentPostId int    `json:"parent_post_id"`
 }
-
-// type of the parent in which this comment belongs to
-type CommentRequestParentType string
 
 // CommentResponse defines model for CommentResponse.
 type CommentResponse struct {
-	AuthorId *string `json:"author_id,omitempty"`
+	AuthorId *int64  `json:"author_id,omitempty"`
+	Content  *string `json:"content,omitempty"`
+	Id       *int64  `json:"id,omitempty"`
 
-	// comment of this comment
-	CommentList *[]CommentResponse `json:"comment_list,omitempty"`
-	Content     *string            `json:"content,omitempty"`
-	ParentId    *string            `json:"parent_id,omitempty"`
-
-	// type of the parent in which this comment belongs to
-	ParentType *string `json:"parent_type,omitempty"`
+	// replies of this comment
+	Replies *[]CommentResponse `json:"replies,omitempty"`
 }
 
 // PostRequest defines model for PostRequest.
 type PostRequest struct {
-	Content string  `json:"content"`
-	Name    *string `json:"name,omitempty"`
+	Content string `json:"content"`
+	Title   string `json:"title"`
 }
 
 // PostResponse defines model for PostResponse.
@@ -70,10 +55,16 @@ type User struct {
 }
 
 // CommentId defines model for commentId.
-type CommentId string
+type CommentId int
 
 // PostId defines model for postId.
 type PostId string
+
+// AddCommentJSONBody defines parameters for AddComment.
+type AddCommentJSONBody CommentRequest
+
+// CreatePostJSONBody defines parameters for CreatePost.
+type CreatePostJSONBody PostRequest
 
 // CreateUserJSONBody defines parameters for CreateUser.
 type CreateUserJSONBody User
@@ -90,20 +81,14 @@ type LoginUserParams struct {
 // UpdateUserJSONBody defines parameters for UpdateUser.
 type UpdateUserJSONBody User
 
-// PostV1CommentJSONBody defines parameters for PostV1Comment.
-type PostV1CommentJSONBody CommentRequest
+// AddCommentJSONRequestBody defines body for AddComment for application/json ContentType.
+type AddCommentJSONRequestBody AddCommentJSONBody
 
-// AddPostJSONBody defines parameters for AddPost.
-type AddPostJSONBody PostRequest
+// CreatePostJSONRequestBody defines body for CreatePost for application/json ContentType.
+type CreatePostJSONRequestBody CreatePostJSONBody
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody CreateUserJSONBody
 
 // UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
 type UpdateUserJSONRequestBody UpdateUserJSONBody
-
-// PostV1CommentJSONRequestBody defines body for PostV1Comment for application/json ContentType.
-type PostV1CommentJSONRequestBody PostV1CommentJSONBody
-
-// AddPostJSONRequestBody defines body for AddPost for application/json ContentType.
-type AddPostJSONRequestBody AddPostJSONBody

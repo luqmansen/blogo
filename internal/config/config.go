@@ -22,7 +22,7 @@ type Configuration struct {
 	GithubClientSecret string `env:"GITHUB_CLIENT_SECRET"`
 }
 
-func LoadConfig(path string) *Configuration {
+func LoadConfig() *Configuration {
 
 	if os.Getenv("DEPLOY") != "PROD" {
 		log.SetLevel(log.DebugLevel)
