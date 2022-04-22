@@ -5,7 +5,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/luqmansen/blogo/internal/blogo"
+	"github.com/luqmansen/blogo/pkg/blogo"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"net/http"

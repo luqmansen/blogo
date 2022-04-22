@@ -35,6 +35,9 @@ type PostResponse struct {
 	Content *string `json:"content,omitempty"`
 	Id      *int64  `json:"id,omitempty"`
 	Name    *string `json:"name,omitempty"`
+
+	// replies of the post
+	Replies *[]CommentResponse `json:"replies,omitempty"`
 }
 
 // Response for multiple post
@@ -58,7 +61,7 @@ type User struct {
 type CommentId int
 
 // PostId defines model for postId.
-type PostId string
+type PostId int64
 
 // AddCommentJSONBody defines parameters for AddComment.
 type AddCommentJSONBody CommentRequest

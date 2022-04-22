@@ -499,6 +499,13 @@
           },
           "content": {
             "type": "string"
+          },
+          "replies" : {
+            "type": "array",
+            "description": "replies of the post",
+            "items": {
+              "$ref": "#/components/schemas/CommentResponse"
+            }
           }
         }
       },
@@ -559,7 +566,8 @@
         "description": "ID of a post",
         "required": true,
         "schema": {
-          "type": "string"
+          "type": "integer",
+          "format": "int64"
         }
       },
       "commentId": {

@@ -3,7 +3,7 @@ package mock
 import (
 	"context"
 	"github.com/google/go-github/v42/github"
-	"github.com/luqmansen/blogo/internal/blogo"
+	"github.com/luqmansen/blogo/pkg/blogo"
 	"net/http"
 )
 

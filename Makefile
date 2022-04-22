@@ -31,7 +31,7 @@ gen-mock:
 	docker run --rm -v $(PWD):/app -w /app luqmansen/docker-mockgen mockgen -source=pkg/services/services.go -destination=mock/service_mock.go -package=mock
 
 gen-server:
-	oapi-codegen --package server --generate gin api/openapi/swagger.json > internal/server/server.gen.go
-	oapi-codegen --package server --generate spec api/openapi/swagger.json > internal/server/spec.gen.go
-	oapi-codegen --package server --generate types api/openapi/swagger.json > internal/server/types.gen.go
+	oapi-codegen --package server --generate gin api/openapi/swagger.json > pkg/server/server.gen.go
+	oapi-codegen --package server --generate spec api/openapi/swagger.json > pkg/server/spec.gen.go
+	oapi-codegen --package server --generate types api/openapi/swagger.json > pkg/server/types.gen.go
 

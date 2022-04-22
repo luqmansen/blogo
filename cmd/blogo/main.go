@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/luqmansen/blogo/internal/blogo"
-	"github.com/luqmansen/blogo/internal/config"
-	"github.com/luqmansen/blogo/internal/repository/postgres"
-	"github.com/luqmansen/blogo/internal/server"
+	"github.com/luqmansen/blogo/pkg/blogo"
+	"github.com/luqmansen/blogo/pkg/config"
+	"github.com/luqmansen/blogo/pkg/repository/postgres"
+	"github.com/luqmansen/blogo/pkg/server"
 )
 
 var (
@@ -24,7 +24,7 @@ func main() {
 
 	postRepo := postgres.NewPostRepository(db)
 	commentRepo := postgres.NewCommentRepository(db)
-	postService := blogo.NewPostService(postRepo)
+	postService := blogo.NewPostService(postRepo, commentRepo)
 	commentService := blogo.NewCommentService(commentRepo)
 	handler := server.NewHandler(conf, postService, commentService)
 

@@ -15,6 +15,8 @@ type Comment struct {
 }
 
 type CommentRepository interface {
+	// GetByPostId get comment which bind to a post
+	GetByPostID(commentId uint64) []*Comment
 	GetByID(commentId uint64) *Comment
 	InsertComment(comment *Comment) error
 }
@@ -33,8 +35,4 @@ func (c CommentService) GetCommentByID(commentId uint64) *Comment {
 
 func (c CommentService) CreateComment(comment *Comment) error {
 	return c.commentRepo.InsertComment(comment)
-}
-
-func BuildTree([]*Comment) []*Comment {
-	return nil
 }

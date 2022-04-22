@@ -1,11 +1,12 @@
 package postgres
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/luqmansen/blogo/internal/blogo"
+	"github.com/luqmansen/blogo/pkg/blogo"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,9 +25,19 @@ func (r PostRepository) GetPost(limit, offset int) []*blogo.Post {
 	return posts
 }
 
-func (r PostRepository) FindByID(postID uint64) error {
-	//TODO implement me
-	panic("implement me")
+func (r PostRepository) FindByID(postID uint64) *blogo.Post {
+	query := `SELECT * FROM blogo.public.posts where id = ($1) limit 1`
+	var post blogo.Post
+	err := r.db.Get(&post, query, postID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		} else {
+			panic(err)
+		}
+	}
+
+	return &post
 }
 
 func (r PostRepository) InsertPost(post *blogo.Post) error {
