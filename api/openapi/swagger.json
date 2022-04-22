@@ -493,6 +493,13 @@
             "format": "int64",
             "example": 10
           },
+          "author_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "author_username" : {
+            "type": "string"
+          },
           "name": {
             "type": "string",
             "example": "Post title"
@@ -548,6 +555,9 @@
           "author_id": {
             "type": "integer",
             "format": "int64"
+          },
+          "author_username": {
+            "type": "string"
           },
           "replies": {
             "description": "replies of this comment",

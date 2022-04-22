@@ -26,7 +26,11 @@ func (r PostRepository) GetPost(limit, offset int) []*blogo.Post {
 }
 
 func (r PostRepository) FindByID(postID uint64) *blogo.Post {
-	query := `SELECT * FROM blogo.public.posts where id = ($1) limit 1`
+	query := `
+select posts.*, u.username from blogo.public.posts
+join blogo.public.users u on u.id = posts.author_id
+where posts.id = ($1) 
+`
 	var post blogo.Post
 	err := r.db.Get(&post, query, postID)
 	if err != nil {

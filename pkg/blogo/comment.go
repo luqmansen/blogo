@@ -7,11 +7,14 @@ type Comment struct {
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 
-	ParentPostID uint64     `db:"parent_post_id" json:"parent_post_id"`
-	ParentID     *int       `db:"parent_id" json:"parent_id"` // allow nullable on lvl 0 comment
-	AuthorID     uint64     `db:"author_id" json:"author_id"`
-	Content      string     `db:"content" json:"content"`
-	Replies      []*Comment `json:"replies"`
+	ParentPostID uint64 `db:"parent_post_id" json:"parent_post_id"`
+	ParentID     *int   `db:"parent_id" json:"parent_id"` // allow nullable on lvl 0 comment
+
+	AuthorID       uint64  `db:"author_id" json:"author_id"`
+	AuthorUsername *string `db:"username" json:"author_username"`
+
+	Content string     `db:"content" json:"content"`
+	Replies []*Comment `json:"replies"`
 }
 
 type CommentRepository interface {

@@ -31,23 +31,27 @@ func (r CommentRepository) InsertComment(comment *blogo.Comment) error {
 // GetByID will get a parent comments and all of its child down to N level
 func (r CommentRepository) GetByID(commentId uint64) *blogo.Comment {
 	query := `
-WITH RECURSIVE cte (id, content, author_id, parent_id) as (
-    select id,
-           content,
-           author_id,
-           parent_id
+WITH RECURSIVE cte (id, content, author_id,parent_id, username) as (
+    select comments.id,
+           comments.content,
+           comments.author_id,
+           comments.parent_id,
+			users.username       
     from comments
-    where  id = cast(($1) as bigint)
+    join users on comments.author_id = users.id
+    where  comments.id = cast(($1) as bigint)
 
     union all
 
     select comments.id,
            comments.content,
            comments.author_id,
-           comments.parent_id
+           comments.parent_id,
+			users.username       
     from comments
+	join users on comments.author_id = users.id
     join cte on comments.parent_id = cte.id
-) select id, content, author_id, parent_id from cte
+) select id, content, author_id, parent_id, username from cte
 order by id
 `
 	var comments []*blogo.Comment
@@ -85,23 +89,27 @@ order by id
 // GetByPostID will get all comments by its post id
 func (r CommentRepository) GetByPostID(postId uint64) []*blogo.Comment {
 	query := `
-WITH RECURSIVE cte (id, content, author_id, parent_id) as (
-    select id,
-           content,
-           author_id,
-           parent_id
+WITH RECURSIVE cte (id, content, author_id,parent_id, username) as (
+    select comments.id,
+           comments.content,
+           comments.author_id,
+           comments.parent_id,
+			users.username       
     from comments
-    where  parent_post_id = cast(($1) as bigint)
+    join users on comments.author_id = users.id
+    where  comments.parent_post_id = cast(($1) as bigint)
 
     union all
 
     select comments.id,
            comments.content,
            comments.author_id,
-           comments.parent_id
+           comments.parent_id,
+			users.username       
     from comments
+	join users on comments.author_id = users.id
     join cte on comments.parent_id = cte.id
-) select id, content, author_id, parent_id from cte
+) select id, content, author_id, parent_id, username from cte
 order by id
 `
 	var comments []*blogo.Comment

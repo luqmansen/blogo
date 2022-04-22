@@ -16,9 +16,10 @@ type CommentRequest struct {
 
 // CommentResponse defines model for CommentResponse.
 type CommentResponse struct {
-	AuthorId *int64  `json:"author_id,omitempty"`
-	Content  *string `json:"content,omitempty"`
-	Id       *int64  `json:"id,omitempty"`
+	AuthorId       *int64  `json:"author_id,omitempty"`
+	AuthorUsername *string `json:"author_username,omitempty"`
+	Content        *string `json:"content,omitempty"`
+	Id             *int64  `json:"id,omitempty"`
 
 	// replies of this comment
 	Replies *[]CommentResponse `json:"replies,omitempty"`
@@ -32,9 +33,11 @@ type PostRequest struct {
 
 // PostResponse defines model for PostResponse.
 type PostResponse struct {
-	Content *string `json:"content,omitempty"`
-	Id      *int64  `json:"id,omitempty"`
-	Name    *string `json:"name,omitempty"`
+	AuthorId       *int64  `json:"author_id,omitempty"`
+	AuthorUsername *string `json:"author_username,omitempty"`
+	Content        *string `json:"content,omitempty"`
+	Id             *int64  `json:"id,omitempty"`
+	Name           *string `json:"name,omitempty"`
 
 	// replies of the post
 	Replies *[]CommentResponse `json:"replies,omitempty"`
