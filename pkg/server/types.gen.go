@@ -7,6 +7,13 @@ const (
 	Petstore_authScopes = "petstore_auth.Scopes"
 )
 
+// Defines values for ReactRequestResourceKind.
+const (
+	ReactRequestResourceKindComment ReactRequestResourceKind = "comment"
+
+	ReactRequestResourceKindPost ReactRequestResourceKind = "post"
+)
+
 // CommentRequest defines model for CommentRequest.
 type CommentRequest struct {
 	Content      string `json:"content"`
@@ -20,6 +27,10 @@ type CommentResponse struct {
 	AuthorUsername *string `json:"author_username,omitempty"`
 	Content        *string `json:"content,omitempty"`
 	Id             *int64  `json:"id,omitempty"`
+
+	// describe whether a post is already reacted by user, if tru
+	IsReacted  *bool         `json:"is_reacted,omitempty"`
+	ReactViews *[]ReactCount `json:"react_views,omitempty"`
 
 	// replies of this comment
 	Replies *[]CommentResponse `json:"replies,omitempty"`
@@ -37,7 +48,11 @@ type PostResponse struct {
 	AuthorUsername *string `json:"author_username,omitempty"`
 	Content        *string `json:"content,omitempty"`
 	Id             *int64  `json:"id,omitempty"`
-	Name           *string `json:"name,omitempty"`
+
+	// describe whether a post is already reacted by user
+	IsReacted  *bool         `json:"is_reacted,omitempty"`
+	Name       *string       `json:"name,omitempty"`
+	ReactViews *[]ReactCount `json:"react_views,omitempty"`
 
 	// replies of the post
 	Replies *[]CommentResponse `json:"replies,omitempty"`
@@ -45,6 +60,38 @@ type PostResponse struct {
 
 // Response for multiple post
 type PostsResponse []PostResponse
+
+// describe count of reaction on a given resource (eg: post, comment)
+type ReactCount struct {
+	Count   *int `json:"count,omitempty"`
+	ReactId *int `json:"react_id,omitempty"`
+}
+
+// ReactListResponse defines model for ReactListResponse.
+type ReactListResponse []struct {
+	Id   *int64  `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+
+	// url of the react thumbnail
+	ThumbnailImg *string `json:"thumbnail_img,omitempty"`
+}
+
+// ReactRequest defines model for ReactRequest.
+type ReactRequest struct {
+	// id of the react type. Get the id from react list endpoint
+	ReactId      int64                    `json:"react_id"`
+	ResourceId   int64                    `json:"resource_id"`
+	ResourceKind ReactRequestResourceKind `json:"resource_kind"`
+}
+
+// ReactRequestResourceKind defines model for ReactRequest.ResourceKind.
+type ReactRequestResourceKind string
+
+// ResourceCreatedResponse defines model for ResourceCreatedResponse.
+type ResourceCreatedResponse struct {
+	Message *string `json:"message,omitempty"`
+	Status  *string `json:"status,omitempty"`
+}
 
 // User defines model for User.
 type User struct {
@@ -72,6 +119,9 @@ type AddCommentJSONBody CommentRequest
 // CreatePostJSONBody defines parameters for CreatePost.
 type CreatePostJSONBody PostRequest
 
+// AddReactJSONBody defines parameters for AddReact.
+type AddReactJSONBody ReactRequest
+
 // CreateUserJSONBody defines parameters for CreateUser.
 type CreateUserJSONBody User
 
@@ -92,6 +142,9 @@ type AddCommentJSONRequestBody AddCommentJSONBody
 
 // CreatePostJSONRequestBody defines body for CreatePost for application/json ContentType.
 type CreatePostJSONRequestBody CreatePostJSONBody
+
+// AddReactJSONRequestBody defines body for AddReact for application/json ContentType.
+type AddReactJSONRequestBody AddReactJSONBody
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody CreateUserJSONBody

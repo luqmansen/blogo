@@ -28,6 +28,12 @@ type ServerInterface interface {
 	// Finds Post by ID
 	// (GET /api/v1/post/{postId})
 	FindPostByID(c *gin.Context, postId PostId)
+
+	// (GET /api/v1/react/)
+	GetReactList(c *gin.Context)
+
+	// (POST /api/v1/react/)
+	AddReact(c *gin.Context)
 	// Create user
 	// (POST /user)
 	CreateUser(c *gin.Context)
@@ -130,6 +136,26 @@ func (siw *ServerInterfaceWrapper) FindPostByID(c *gin.Context) {
 	}
 
 	siw.Handler.FindPostByID(c, postId)
+}
+
+// GetReactList operation middleware
+func (siw *ServerInterfaceWrapper) GetReactList(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.GetReactList(c)
+}
+
+// AddReact operation middleware
+func (siw *ServerInterfaceWrapper) AddReact(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.AddReact(c)
 }
 
 // CreateUser operation middleware
@@ -279,6 +305,10 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 	router.POST(options.BaseURL+"/api/v1/post", wrapper.CreatePost)
 
 	router.GET(options.BaseURL+"/api/v1/post/:postId", wrapper.FindPostByID)
+
+	router.GET(options.BaseURL+"/api/v1/react/", wrapper.GetReactList)
+
+	router.POST(options.BaseURL+"/api/v1/react/", wrapper.AddReact)
 
 	router.POST(options.BaseURL+"/user", wrapper.CreateUser)
 

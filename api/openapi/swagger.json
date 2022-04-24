@@ -23,6 +23,10 @@
       "description": "Operations about comment"
     },
     {
+      "name": "react",
+      "description": "React is an operation to give a particular resource a reaction (eg: Like, Angery, etc)"
+    },
+    {
       "name": "user",
       "description": "Operations about user"
     }
@@ -173,6 +177,55 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/react/": {
+      "get": {
+        "description": "Get available react",
+        "tags": [
+          "react"
+        ],
+        "operationId": "getReactList",
+        "responses": {
+          "200": {
+            "description": "success get reaction list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReactListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "add reaction to a post / comment",
+        "tags": [
+          "react"
+        ],
+        "operationId": "addReact",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReactRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "reaction created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceCreatedResponse"
                 }
               }
             }
@@ -497,7 +550,7 @@
             "type": "integer",
             "format": "int64"
           },
-          "author_username" : {
+          "author_username": {
             "type": "string"
           },
           "name": {
@@ -507,7 +560,17 @@
           "content": {
             "type": "string"
           },
-          "replies" : {
+          "is_reacted": {
+            "type": "boolean",
+            "description": "describe whether a post is already reacted by user"
+          },
+          "react_views": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReactCount"
+            }
+          },
+          "replies": {
             "type": "array",
             "description": "replies of the post",
             "items": {
@@ -559,12 +622,90 @@
           "author_username": {
             "type": "string"
           },
+          "is_reacted": {
+            "type": "boolean",
+            "description": "describe whether a post is already reacted by user, if tru"
+          },
+          "react_views": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReactCount"
+            }
+          },
           "replies": {
             "description": "replies of this comment",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CommentResponse"
             }
+          }
+        }
+      },
+      "ResourceCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ReactListResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "thumbnail_img": {
+              "description": "url of the react thumbnail",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReactRequest": {
+        "required": [
+          "resource_kind",
+          "resource_id",
+          "react_id"
+        ],
+        "type": "object",
+        "properties": {
+          "resource_kind": {
+            "type": "string",
+            "enum": [
+              "post",
+              "comment"
+            ]
+          },
+          "resource_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "react_id": {
+            "description": "id of the react type. Get the id from react list endpoint",
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ReactCount": {
+        "description": "describe count of reaction on a given resource (eg: post, comment)",
+        "type": "object",
+        "properties": {
+          "react_id": {
+            "type": "integer"
+          },
+          "count": {
+            "type": "integer"
           }
         }
       }

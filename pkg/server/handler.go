@@ -12,18 +12,21 @@ type handler struct {
 	oauthConfig    OAuth2ConfigInterface
 	postService    *blogo.PostService
 	commentService *blogo.CommentService
+	reactService   *blogo.ReactService
 }
 
 func NewHandler(
 	config *config.Configuration,
 	postService *blogo.PostService,
 	commentService *blogo.CommentService,
+	reactService *blogo.ReactService,
 	//oauthConfig OAuth2ConfigInterface,
 ) ServerInterface {
 	return handler{
 		config:         config,
 		postService:    postService,
 		commentService: commentService,
+		reactService:   reactService,
 		//oauthConfig: oauthConfig,
 	}
 }
