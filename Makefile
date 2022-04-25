@@ -22,6 +22,8 @@ create-migration:
 
 migrate-up:
 	docker run --rm -v `pwd`/db/migration:/migration --network host migrate/migrate  -path=/migration -database "postgres://blogo:blogo@0.0.0.0:5432/blogo?sslmode=disable" up
+	cat db/seed.sql| docker  exec -i postgres_container psql -h localhost -d blogo -U blogo -p 5432
+
 
 migrate-down:
 	docker run --rm -v `pwd`/db/migration:/migration --network host migrate/migrate  -path=/migration -database "postgres://blogo:blogo@0.0.0.0:5432/blogo?sslmode=disable" down -all
