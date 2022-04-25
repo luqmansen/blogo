@@ -7,13 +7,6 @@ const (
 	Petstore_authScopes = "petstore_auth.Scopes"
 )
 
-// Defines values for ReactRequestResourceKind.
-const (
-	ReactRequestResourceKindComment ReactRequestResourceKind = "comment"
-
-	ReactRequestResourceKindPost ReactRequestResourceKind = "post"
-)
-
 // CommentRequest defines model for CommentRequest.
 type CommentRequest struct {
 	Content      string `json:"content"`
@@ -34,6 +27,12 @@ type CommentResponse struct {
 
 	// replies of this comment
 	Replies *[]CommentResponse `json:"replies,omitempty"`
+}
+
+// describe error
+type ErrorResponse struct {
+	Message string `json:"message"`
+	Status  bool   `json:"status"`
 }
 
 // PostRequest defines model for PostRequest.
@@ -78,19 +77,17 @@ type ReactListResponse []struct {
 
 // ReactRequest defines model for ReactRequest.
 type ReactRequest struct {
-	// id of the react type. Get the id from react list endpoint
-	ReactId      int64                    `json:"react_id"`
-	ResourceId   int64                    `json:"resource_id"`
-	ResourceKind ReactRequestResourceKind `json:"resource_kind"`
-}
+	CommentId *int64 `json:"comment_id,omitempty"`
+	PostId    *int64 `json:"post_id,omitempty"`
 
-// ReactRequestResourceKind defines model for ReactRequest.ResourceKind.
-type ReactRequestResourceKind string
+	// id of the react type. Get the id from react list endpoint
+	ReactId int64 `json:"react_id"`
+}
 
 // ResourceCreatedResponse defines model for ResourceCreatedResponse.
 type ResourceCreatedResponse struct {
-	Message *string `json:"message,omitempty"`
-	Status  *string `json:"status,omitempty"`
+	Message string `json:"message"`
+	Status  bool   `json:"status"`
 }
 
 // User defines model for User.

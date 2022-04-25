@@ -229,6 +229,16 @@
                 }
               }
             }
+          },
+          "default": {
+            "description": "error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -643,12 +653,16 @@
       },
       "ResourceCreatedResponse": {
         "type": "object",
+        "required": [
+          "message",
+          "status"
+        ],
         "properties": {
           "message": {
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "boolean"
           }
         }
       },
@@ -673,20 +687,15 @@
       },
       "ReactRequest": {
         "required": [
-          "resource_kind",
-          "resource_id",
           "react_id"
         ],
         "type": "object",
         "properties": {
-          "resource_kind": {
-            "type": "string",
-            "enum": [
-              "post",
-              "comment"
-            ]
+          "post_id": {
+            "type": "integer",
+            "format": "int64"
           },
-          "resource_id": {
+          "comment_id": {
             "type": "integer",
             "format": "int64"
           },
@@ -706,6 +715,19 @@
           },
           "count": {
             "type": "integer"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "description": "describe error",
+        "type": "object",
+        "required": ["message", "status"],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "boolean"
           }
         }
       }

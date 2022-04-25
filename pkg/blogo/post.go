@@ -12,9 +12,10 @@ type Post struct {
 	AuthorID       uint64 `db:"author_id" json:"author_id"`
 	AuthorUsername string `db:"username" json:"author_username"`
 
-	Title   string     `db:"title" json:"title"`
-	Content string     `db:"content" json:"content"`
-	Replies []*Comment `json:"replies"`
+	Title      string        `db:"title" json:"title"` // # TODO add field validation before insert
+	Content    string        `db:"content" json:"content"`
+	ReactViews []*ReactViews `json:"react_views"`
+	Replies    []*Comment    `json:"replies"`
 
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
@@ -29,38 +30,39 @@ type PostRepository interface {
 type PostService struct {
 	postRepository    PostRepository
 	commentRepository CommentRepository
+	reactRepository   ReactRepository
 }
 
-func NewPostService(postRepo PostRepository, commentRepo CommentRepository) *PostService {
+func NewPostService(postRepo PostRepository, commentRepo CommentRepository, reactRepo ReactRepository) *PostService {
 	return &PostService{
 		postRepository:    postRepo,
 		commentRepository: commentRepo,
+		reactRepository:   reactRepo,
 	}
 }
 
 func (p PostService) CreatePost(payload *Post) error {
 
-	post := &Post{
-		AuthorID: 1,
-		Title:    payload.Title,
-		Content:  payload.Content,
-	}
+	payload.AuthorID = 1
 
-	return p.postRepository.InsertPost(post)
+	return p.postRepository.InsertPost(payload)
 }
 
 func (p PostService) GetPostMany(limit, pageNum int) []*Post {
 	return p.postRepository.GetPost(limit, pageNum)
 }
 
-func (p PostService) GetPostByID(postId uint64) *Post {
-	post := p.postRepository.FindByID(postId)
+func (p PostService) GetPostByID(postID uint64) *Post {
+	post := p.postRepository.FindByID(postID)
 	if post == nil {
 		return nil
 	}
 
-	comments := p.commentRepository.GetByPostID(postId)
+	comments := p.commentRepository.GetByPostID(postID)
 	post.Replies = comments
+
+	reactViews := p.reactRepository.GetByPostID(postID)
+	post.ReactViews = reactViews
 
 	return post
 }

@@ -24,9 +24,17 @@ func main() {
 
 	postRepo := postgres.NewPostRepository(db)
 	commentRepo := postgres.NewCommentRepository(db)
-	postService := blogo.NewPostService(postRepo, commentRepo)
+	reactRepo := postgres.NewReactRepository(db)
+	postService := blogo.NewPostService(postRepo, commentRepo, reactRepo)
 	commentService := blogo.NewCommentService(commentRepo)
-	handler := server.NewHandler(conf, postService, commentService)
+	reactService := blogo.NewReactService(reactRepo)
+
+	handler := server.NewHandler(
+		conf,
+		postService,
+		commentService,
+		reactService,
+	)
 
 	//oauth2Config := &oauth2.Config{
 	//	ClientID:     conf.GithwubClientId,

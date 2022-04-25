@@ -14,6 +14,12 @@ type PostRepository struct {
 	db *sqlx.DB
 }
 
+func NewPostRepository(sqlClient *sqlx.DB) *PostRepository {
+	return &PostRepository{
+		db: sqlClient,
+	}
+}
+
 func (r PostRepository) GetPost(limit, offset int) []*blogo.Post {
 	query := `SELECT * FROM blogo.public.posts limit ($1) offset ($2)`
 	var posts []*blogo.Post
@@ -55,12 +61,6 @@ func (r PostRepository) InsertPost(post *blogo.Post) error {
 	return nil
 }
 
-func NewPostRepository(sqlClient *sqlx.DB) *PostRepository {
-	return &PostRepository{
-		db: sqlClient,
-	}
-
-}
 func debugStruct(d interface{}) {
 	s, _ := json.MarshalIndent(d, "", "\t")
 	fmt.Println(string(s))
