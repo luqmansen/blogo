@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
+type PostId uint64
+
 type Post struct {
-	ID uint64 `db:"id" json:"id"`
+	ID PostId `db:"id" json:"id"`
 
 	AuthorID       uint64 `db:"author_id" json:"author_id"`
 	AuthorUsername string `db:"username" json:"author_username"`
@@ -22,7 +24,7 @@ type Post struct {
 }
 
 type PostRepository interface {
-	FindByID(postID uint64) *Post
+	FindByID(PostId) *Post
 	InsertPost(post *Post) error
 	GetPost(limit, offset int) []*Post
 }
@@ -52,7 +54,7 @@ func (p PostService) GetPostMany(limit, pageNum int) []*Post {
 	return p.postRepository.GetPost(limit, pageNum)
 }
 
-func (p PostService) GetPostByID(postID uint64) *Post {
+func (p PostService) GetPostByID(postID PostId) *Post {
 	post := p.postRepository.FindByID(postID)
 	if post == nil {
 		return nil

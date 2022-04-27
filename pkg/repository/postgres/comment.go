@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/luqmansen/blogo/pkg/blogo"
@@ -17,7 +19,25 @@ func NewCommentRepository(sqlClient *sqlx.DB) *CommentRepository {
 	}
 }
 
+func isCommentExists(db *sqlx.DB, id blogo.CommentId) bool {
+	qry := `SELECT * FROM comments WHERE id = ($1)`
+
+	var c blogo.Comment
+	err := db.Get(&c, qry, id)
+	debugStruct(c)
+	fmt.Println(err)
+	if err != nil && err == sql.ErrNoRows {
+		return false
+	}
+	return true
+}
+
 func (r CommentRepository) InsertComment(comment *blogo.Comment) error {
+
+	if !isCommentExists(r.db, blogo.CommentId(*comment.ParentID)) {
+		return errors.New("parent id does not exists")
+	}
+
 	statement := `INSERT INTO blogo.public.comments (parent_post_id, parent_id, author_id, content) VALUES ($1, $2, $3, $4)`
 
 	result, err := r.db.Exec(statement, comment.ParentPostID, comment.ParentID, comment.AuthorID, comment.Content)
@@ -29,7 +49,7 @@ func (r CommentRepository) InsertComment(comment *blogo.Comment) error {
 }
 
 // GetByID will get a parent comments and all of its child down to N level
-func (r CommentRepository) GetByID(commentId uint64) *blogo.Comment {
+func (r CommentRepository) GetByID(commentId blogo.CommentId) *blogo.Comment {
 	query := `
 WITH RECURSIVE cte (id, content, author_id,parent_id, username) as (
     select comments.id,
@@ -60,20 +80,22 @@ order by id
 		panic(err)
 	}
 
-	node := make(map[uint64]*blogo.Comment)
+	node := make(map[blogo.CommentId]*blogo.Comment)
 	for _, v := range comments {
 		node[v.ID] = v
 	}
+
 	var rootNode *blogo.Comment
+	// assign replies to each comment
 	for _, comm := range node {
-		if comm.ParentID == nil {
+		if comm.ID == commentId {
 			rootNode = comm
 			continue
 		}
 
-		parent := node[uint64(*comm.ParentID)]
+		parent := node[blogo.CommentId(*comm.ParentID)]
 		if parent == nil {
-			panic(fmt.Sprintf("parent nil %d", *comm.ParentID))
+			continue
 		}
 		if parent.Replies == nil {
 			parent.Replies = make([]*blogo.Comment, 0)
@@ -83,11 +105,25 @@ order by id
 		}
 	}
 
+	commentIDs := make([]blogo.CommentId, len(comments))
+	for idx, v := range comments {
+		commentIDs[idx] = v.ID
+	}
+
+	reactList := getReactByCommentID(r.db, commentIDs)
+	// assign react  to each comment
+	for _, comm := range node {
+		rv, ok := reactList[comm.ID]
+		if ok {
+			comm.ReactViews = rv
+		}
+	}
+
 	return rootNode
 }
 
 // GetByPostID will get all comments by its post id
-func (r CommentRepository) GetByPostID(postId uint64) []*blogo.Comment {
+func (r CommentRepository) GetByPostID(postId blogo.PostId) []*blogo.Comment {
 	query := `
 WITH RECURSIVE cte (id, content, author_id,parent_id, username) as (
     select comments.id,
@@ -118,7 +154,7 @@ order by id
 		panic(err)
 	}
 
-	node := make(map[uint64]*blogo.Comment)
+	node := make(map[blogo.CommentId]*blogo.Comment)
 	for _, v := range comments {
 		node[v.ID] = v
 	}
@@ -130,15 +166,31 @@ order by id
 			continue
 		}
 
-		parent := node[uint64(*comm.ParentID)]
+		parent := node[blogo.CommentId(*comm.ParentID)]
 		if parent == nil {
-			panic(fmt.Sprintf("parent nil %d", *comm.ParentID))
+			continue
 		}
 		if parent.Replies == nil {
 			parent.Replies = make([]*blogo.Comment, 0)
 			parent.Replies = append(parent.Replies, comm)
 		} else {
 			parent.Replies = append(parent.Replies, comm)
+		}
+	}
+
+	commentIDs := make([]blogo.CommentId, len(comments))
+	for idx, v := range comments {
+		commentIDs[idx] = v.ID
+	}
+
+	reactList := getReactByCommentID(r.db, commentIDs)
+	// I separate the loop for the sake of code clarity,
+	// the algorithm complexity should be the same
+	for _, comm := range node {
+		rv, ok := reactList[comm.ID]
+		if ok {
+			// assign react to each comment
+			comm.ReactViews = rv
 		}
 	}
 

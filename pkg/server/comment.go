@@ -29,7 +29,7 @@ func (h handler) AddComment(c *gin.Context) {
 }
 
 func (h handler) GetCommentByID(c *gin.Context, commentId CommentId) {
-	posts := h.commentService.GetCommentByID(uint64(commentId))
+	posts := h.commentService.GetCommentByID(blogo.CommentId(commentId))
 
 	var resp CommentResponse
 	marshal(posts, &resp)

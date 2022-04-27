@@ -29,7 +29,7 @@ func (h handler) CreatePost(c *gin.Context) {
 }
 
 func (h handler) FindPostByID(c *gin.Context, postId PostId) {
-	p := h.postService.GetPostByID(uint64(postId))
+	p := h.postService.GetPostByID(blogo.PostId(postId))
 	if p == nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return

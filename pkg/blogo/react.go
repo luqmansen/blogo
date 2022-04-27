@@ -4,13 +4,6 @@ import (
 	"time"
 )
 
-type ReactResourceKind int
-
-const (
-	ReactResourceKindPost    ReactResourceKind = 1
-	ReactResourceKindComment ReactResourceKind = 2
-)
-
 type React struct {
 	ID uint64 `db:"id" json:"id"`
 
@@ -31,7 +24,7 @@ type ReactViews struct {
 
 type ReactRepository interface {
 	InsertUserReact(react *React) error
-	GetByPostID(postID uint64) []*ReactViews
+	GetByPostID(PostId) []*ReactViews
 }
 
 type ReactService struct {

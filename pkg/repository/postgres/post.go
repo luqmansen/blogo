@@ -31,7 +31,7 @@ func (r PostRepository) GetPost(limit, offset int) []*blogo.Post {
 	return posts
 }
 
-func (r PostRepository) FindByID(postID uint64) *blogo.Post {
+func (r PostRepository) FindByID(postID blogo.PostId) *blogo.Post {
 	query := `
 select posts.*, u.username from blogo.public.posts
 join blogo.public.users u on u.id = posts.author_id
